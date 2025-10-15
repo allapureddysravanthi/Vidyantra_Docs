@@ -1,0 +1,27 @@
+#How to use controlledInput
+
+
+Import the below component 
+
+    1)       <ControlledInput
+        label="Teaching Language *"
+        name="teachingLanguage"
+        value={teachingLanguage}
+        onChange={(value) => setTeachingLanguage(value)}
+        placeholder="This is a test one"
+        suggestions={test}
+        isSearchable={true}
+        height="60px"
+        width=""
+
+      />
+
+      2) Pass the value as a state 
+      const [teachingLanguage, setTeachingLanguage] = useState("");
+
+      3)and for the dropdown options 
+      create a array const languages = [
+  "English",
+  "Spanish",
+];
+and pass this one to the inported Componnet in place of suggestions={} as a prop

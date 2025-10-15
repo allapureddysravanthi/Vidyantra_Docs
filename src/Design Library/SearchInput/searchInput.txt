@@ -1,0 +1,84 @@
+
+
+
+🔍 <SearchInput /> Component Documentation
+--------------------------------------------
+
+A customizable, accessible, and styled search input field built with React and Tailwind CSS.
+
+------------------
+🧩 Usage Example
+-------------------
+
+import React, { useState } from 'react';
+import SearchInput from './Design Library/SearchInput/SearchInput';
+
+const App = () => {
+  const [value1, setValue1] = useState('');
+  const [value2, setValue2] = useState('Some text');
+  const [value3, setValue3] = useState('');
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-white p-10 rounded-md shadow-md">
+        {/* Default */}
+        <SearchInput
+          placeholder="Search with icon"
+          value={value1}                                                  -----------> for search
+          onChange={(e) => setValue1(e.target.value)}
+          icon="search"
+          width="w-80"    
+          height="h-80"
+        />
+
+        {/* With clear icon */}
+        <SearchInput
+          placeholder="Search with clear"
+          value={value2}                                                  -----------> for clear
+          onChange={(e) => setValue2(e.target.value)}
+          onClear={() => setValue2('')}
+          icon="clear"
+        />
+
+        {/* Disabled */}
+        <SearchInput
+          placeholder="Disabled input"
+          value={value3}                                                  -----------> for disable 
+          onChange={(e) => setValue3(e.target.value)}
+          disabled
+        />
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+--------------
+⚙️ Props API  (this is like what we have to pass into the props of the component)
+--------------
+
+| Prop          | Type                              | Required | Default                   | Description                                         |
+| ------------- | --------------------------------- | -------- | ------------------------- | --------------------------------------------------- |
+| `placeholder` | `string`                          | No       | `'Placeholder text here'` | Placeholder text shown inside the input field.      |
+| `value`       | `string`                          | Yes      | –                         | The current input value (controlled input).         |
+| `onChange`    | `(e: React.ChangeEvent)`          | Yes      | –                         | Callback when user types in the input.              |
+| `onClear`     | `() => void`                      | No       | –                         | Optional callback when clear (`✖`) icon is clicked. |
+| `icon`        | `'search'` \| `'clear'` \| `null` | No       | `'search'`                | Type of icon to show on the right.                  |
+| `disabled`    | `boolean`                         | No       | `false`                   | Disables the input if true.                         |
+| `className`   | `string`                          | No       | `''`                      | Additional classes to override or extend styling.   |
+
+---------------------
+🧪 States Supported
+---------------------
+
+✅ Default
+
+🔍 With search icon
+
+❌ With clear icon (✖)
+
+🚫 Disabled
+
+✨ Focus & Hover (Tailwind powered)
+
