@@ -12,7 +12,8 @@ const SearchInput = ({
   width = '200px',
   height = '40px',
   backgroundColor = '#fff',
-  color = ''
+  color = '',
+  isDark = false
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -20,16 +21,16 @@ const SearchInput = ({
     // flex: 1, 
     width: width,
     height: height,
-    border: `1px solid ${isFocused ? '#999' : '#ccc'}`,
+    border: `1px solid ${isFocused ? (isDark ? '#FFFFFF' : '#999') : (isDark ? '#FFFFFF' : '#ccc')}`,
     borderRadius: '4px',
     padding: '0 1rem',
     paddingRight: '2.5rem',
     outline: 'none',
-    color: '#4B5563',
-    backgroundColor: disabled ? '#D1D5DB' : backgroundColor, // force gray-300 if disabled
+    color: isDark ? '#FFFFFF' : '#4B5563',
+    backgroundColor: disabled ? '#D1D5DB' : (isDark ? '#1F2937' : backgroundColor),
     opacity: disabled ? 0.6 : 1,
     cursor: disabled ? 'not-allowed' : 'text',
-    transition: 'border-color 0.3s',
+    transition: 'border-color 0.3s, background-color 0.3s, color 0.3s',
     ...(!disabled && parseStyleString(color)) // Only apply custom color if not disabled
   };
 
@@ -43,9 +44,10 @@ const SearchInput = ({
   const iconStyle = {
     position: 'absolute',
     right: '10px',
-    color: '#4B5563',
+    color: isDark ? '#FFFFFF' : '#4B5563',
     cursor: icon === 'clear' ? 'pointer' : 'default',
-    pointerEvents: icon === 'search' ? 'none' : 'auto'
+    pointerEvents: icon === 'search' ? 'none' : 'auto',
+    transition: 'color 0.3s'
   };
 
   return (

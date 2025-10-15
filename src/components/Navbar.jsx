@@ -1,12 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoMdLogOut } from "react-icons/io";
-import { Menu, Search, Bell, HelpCircle } from "lucide-react";
+import { Menu, Search, Bell, HelpCircle, Sun, Moon } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import ButtonV2 from "../Design Library/Button/ButtonV2";
 import SearchInput from "../Design Library/SearchInput/SearchInput";
+import { useTheme } from "../contexts/ThemeContext";
+import { useNavigation } from "../contexts/NavigationContext";
 
 const Navbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { theme, toggleTheme, isDark } = useTheme();
+  const location = useLocation();
+  const { showNavbarSearch, searchValue, setSearchValue } = useNavigation();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -20,35 +26,39 @@ const Navbar = ({ toggleSidebar }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const [normalValue, setNormalValue] = useState("");
 
 
   return (
-    <div className=" bg-white w-full flex justify-between items-center px-12  border-b border-gray-200  py-3">
-        <div className="flex justify-between w-full items-center  h-16">
+    <div className="bg-white dark:bg-[#1F2937] w-full flex justify-between items-center px-12 border-b border-gray-200 dark:border-gray-700 py-3 transition-colors duration-200">
+        <div className="flex justify-between w-full items-center ">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             {/* <Link to="/"> */}
               <img
-                src="https://res.cloudinary.com/devewerw3/image/upload/v1749710248/Group_17_mvxfzb.png"
+                src={isDark 
+                  ? "https://res.cloudinary.com/dk8aie9hy/image/upload/v1760550356/Group_15_ef35s1.png"
+                  : "https://res.cloudinary.com/dk8aie9hy/image/upload/v1760550717/Group_23_1_iax3ik.png"
+                }
                 alt="Logo"
-                className="w-56 h-11"
-              />
+                className="w-56 h-11 transition-opacity duration-200"
+              /><p className="text-2xl font-bold text-[#DE5E08] ml-2 mt-1">Docs</p>
             {/* </Link> */}
           </div>
 
-          <div className="flex-1 min-w-[150px] max-w-[300px]">
-                <SearchInput
-                  placeholder="Search for Documentation"
-                  value={normalValue}
-                  onChange={(e) => setNormalValue(e.target.value)}
-                  onClear={() => setNormalValue("")}
-                  icon={normalValue ? "clear" : "search"}
-                  width="100%"
-                  height="40px"
-                  rounded
-                />
-              </div>
+          {showNavbarSearch && (
+            <div className="flex-1 min-w-[150px] max-w-[500px]">
+              <SearchInput
+                placeholder="Search for Documentation"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onClear={() => setSearchValue("")}
+                icon={searchValue ? "clear" : "search"}
+                width="100%"
+                height="40px"
+                isDark={isDark}
+              />
+            </div>
+          )}
 
           {/* Desktop Menu */}
           <div className="flex gap-20">
@@ -57,6 +67,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <ButtonV2
                   border=""
                   width='100px'
+                  textColor={isDark ? "#FFFFFF" : "#01274D"}
                   hoverTextColor="#F97316"
                   // isActive={isActive("/home")}
                  
@@ -68,6 +79,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <ButtonV2
                   border=""
                   width='100px'
+                  textColor={isDark ? "#FFFFFF" : "#01274D"}
                   hoverTextColor="#F97316"
                   // isActive={isActive("/pricing")}
                   
@@ -80,6 +92,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <ButtonV2
                   border=""
                   width='100px'
+                  textColor={isDark ? "#FFFFFF" : "#01274D"}
                   hoverTextColor="#F97316"
                   // isActive={isActive("/contact")}
                   
@@ -88,28 +101,31 @@ const Navbar = ({ toggleSidebar }) => {
                   Contact
                 </ButtonV2>
               {/* </Link> */}
-               {/* <Link to="/careers"> */}
-                <ButtonV2
-                  border=""
-                  width='100px'
-                  hoverTextColor="#F97316"
-                  // isActive={isActive("/careers")}
-                  
-
-                >
-                  Careers
-                </ButtonV2>
-              {/* </Link> */}
             </div>
 
-            <div className="hidden md:block">
-              {/* <Link to="/login"> */}
+            <div className="hidden md:flex items-center gap-4">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              >
+                {isDark ? (
+                  <Sun className="w-5 h-5 text-yellow-500" />
+                ) : (
+                  <Moon className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+              
+              <Link to="/signin">
                 <ButtonV2 
-                // hoverTextColor="#F5F5F5" hoverBgColor='#00274D'
+                  textColor={isDark ? "#FFFFFF" : "#01274D"}
+                  border={isDark ? "1px solid #ffffff" : "1px solid #1F2937"}
+                  // hoverTextColor="#F5F5F5" hoverBgColor='#DE5E08'
                 >
-                  Get Started
+                  Sign in
                 </ButtonV2>
-              {/* </Link> */}
+              </Link>
             </div>
           </div>
 

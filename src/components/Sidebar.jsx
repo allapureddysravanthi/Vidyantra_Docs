@@ -1,241 +1,268 @@
 import React, { useState } from "react";
 import {
-  Home,
-  Send,
-  CreditCard,
-  Briefcase,
-  DollarSign,
-  Users,
-  Settings,
   ChevronDown,
   ChevronRight,
+  Home,
+  Monitor,
+  Building2,
+  GitBranch,
 } from "lucide-react";
+import { useNavigation } from "../contexts/NavigationContext";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const Sidebar = () => {
-  const [activeTab, setActiveTab] = useState("Payments");
-  const [openSection, setOpenSection] = useState(null);
+const Sidebar = ({ showRightPanel = false }) => {
+  const [openSections, setOpenSections] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const { activeTab, setActiveTab } = useNavigation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleSection = (label) => {
-    setOpenSection(openSection === label ? null : label);
+    setOpenSections(prev => 
+      prev.includes(label) 
+        ? prev.filter(section => section !== label)
+        : [...prev, label]
+    );
   };
 
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+  };
+
+  // Left navigation tabs
   const tabs = [
     {
-      icon: <Home size={20} />,
-      label: "Home",
-      sections: [
-        {
-          title: "Overview",
-          items: [
-            "Dashboard Overview",
-            "Recent Updates",
-            "API Status",
-            "Release Notes",
-          ],
-        },
-        {
-          title: "Resources",
-          items: ["Developer Docs", "Support", "Community"],
-        },
+      icon: <Monitor size={20} />,
+      label: "Platform",
+    },
+    {
+      icon: <Building2 size={20} />,
+      label: "Organization",
+    },
+    {
+      icon: <GitBranch size={20} />,
+      label: "Branch",
+    },
+  ];
+
+  // Static sections data
+  const sections = [
+    {
+      title: "Overview",
+      items: [
+        "Dashboard Overview",
+        "Recent Updates",
+        "API Status",
+        "Release Notes",
+        "System Health",
+        "Performance Metrics",
+        "User Analytics",
+        "Error Logs",
       ],
     },
     {
-      icon: <Send size={20} />,
-      label: "Get Started",
-      sections: [
-        {
-          title: "Integration Guides",
-          items: [
-            "API Keys Setup",
-            "Checkout Integration",
-            "Plugin Setup",
-            "Test Mode",
-          ],
-        },
-        {
-          title: "SDKs & Libraries",
-          items: ["React SDK", "Node SDK", "Android SDK", "iOS SDK"],
-        },
+      title: "Resources",
+      items: [
+        "Developer Docs", 
+        "Support", 
+        "Community",
+        "Tutorials",
+        "Video Guides",
+        "FAQ",
+        "Best Practices",
+        "Code Examples",
       ],
     },
     {
-      icon: <CreditCard size={20} />,
-      label: "Payments",
-      sections: [
-        {
-          title: "Razorpay Payments",
-          items: [
-            "Payments Changelog",
-            "Sign Up",
-            "Dashboard",
-            "Customers",
-            "Orders",
-            "Payments",
-            "International Payments",
-            "Payment Methods",
-            "Settlements",
-            "Refunds",
-            "Disputes",
-            "Payment Gateway",
-            "Ecommerce Plugins",
-            "Widgets",
-            "Magic Checkout",
-            "Razorpay - Payments on WhatsApp",
-            "Payment Links",
-          ],
-        },
-        {
-          title: "Banking Plus",
-          items: ["Overview", "Accounts", "Payouts", "Reconciliation"],
-        },
-        {
-          title: "Partners",
-          items: ["Partner APIs", "Payout Links", "Partner Onboarding"],
-        },
+      title: "Integration Guides",
+      items: [
+        "API Keys Setup",
+        "Checkout Integration",
+        "Webhook Configuration",
+        "Testing Environment",
+        "Production Setup",
+        "Security Guidelines",
+        "Rate Limiting",
+        "Error Handling",
       ],
     },
     {
-      icon: <Briefcase size={20} />,
-      label: "POS",
-      sections: [
-        {
-          title: "Razorpay POS",
-          items: [
-            "Overview",
-            "Smart Collect",
-            "Device Management",
-            "Transactions",
-            "POS Reports",
-          ],
-        },
+      title: "SDKs & Libraries",
+      items: [
+        "JavaScript SDK", 
+        "Python SDK", 
+        "PHP SDK", 
+        "Mobile SDKs",
+        "React Components",
+        "Vue.js Integration",
+        "Angular Support",
+        "Node.js Library",
       ],
     },
     {
-      icon: <DollarSign size={20} />,
-      label: "Payroll",
-      sections: [
-        {
-          title: "Payroll Management",
-          items: [
-            "Overview",
-            "Employees",
-            "Salary Slips",
-            "Tax & Compliance",
-            "Reports",
-          ],
-        },
+      title: "Payment Methods",
+      items: [
+        "Credit Cards",
+        "Digital Wallets",
+        "Bank Transfers",
+        "Cryptocurrency",
+        "UPI Payments",
+        "Net Banking",
+        "EMI Options",
+        "International Cards",
       ],
     },
     {
-      icon: <Users size={20} />,
-      label: "Partners",
-      sections: [
-        {
-          title: "Partner Network",
-          items: [
-            "Partner Dashboard",
-            "Commission Reports",
-            "API Integrations",
-            "Referral Links",
-          ],
-        },
+      title: "Payment Processing",
+      items: [
+        "Transaction Flow",
+        "Refund Process",
+        "Chargeback Handling",
+        "Fraud Prevention",
+        "Settlement Process",
+        "Reconciliation",
+        "Dispute Management",
+        "Compliance",
       ],
     },
     {
-      icon: <Settings size={20} />,
-      label: "Tools",
-      sections: [
-        {
-          title: "Utilities",
-          items: [
-            "QR Code Generator",
-            "Webhook Tester",
-            "API Playground",
-            "Sandbox Mode",
-          ],
-        },
-        {
-          title: "Account Settings",
-          items: ["Profile", "Security", "Team Management", "Billing"],
-        },
+      title: "Analytics & Reporting",
+      items: [
+        "Transaction Reports",
+        "Revenue Analytics",
+        "Customer Insights",
+        "Performance Dashboards",
+        "Custom Reports",
+        "Data Export",
+        "Real-time Monitoring",
+        "Alert Configuration",
+      ],
+    },
+    {
+      title: "Account Management",
+      items: [
+        "Profile Settings",
+        "Team Management",
+        "Role Permissions",
+        "API Access",
+        "Billing Information",
+        "Subscription Plans",
+        "Usage Limits",
+        "Security Settings",
       ],
     },
   ];
 
-  // Find current active tab
-  const activeTabData = tabs.find((t) => t.label === activeTab);
+  // Determine if we should show the right panel
+  const shouldShowRightPanel = location.pathname !== "/";
 
   return (
-    <div className="flex h-screen bg-gray-500 text-white font-sans">
-      {/* Left Tab Bar */}
-      <div className="w-16 bg-[#0B1220] flex flex-col items-center py-6 space-y-6">
-        {tabs.map((tab, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              setActiveTab(tab.label);
-              setOpenSection(null); // reset opened section when switching tabs
-            }}
-            className={`flex flex-col items-center transition-all ${
-              activeTab === tab.label
-                ? "text-blue-400"
-                : "text-gray-300 hover:text-blue-400"
-            }`}
-          >
-            {tab.icon}
-            <span className="text-[10px] mt-1 block">{tab.label}</span>
-          </button>
-        ))}
+    <div className={`flex h-screen text-white font-sans transition-colors duration-200 ${
+      shouldShowRightPanel ? 'w-full' : 'w-[100px]'
+    }`}>
+      {/* Left Tab Bar - Always visible */}
+      <div className="w-[100px] bg-white border-r border-gray-200 dark:bg-gray-800 flex flex-col items-center py-6 space-y-6 pt-8 transition-colors duration-200">
+        {/* Home Button */}
+        <button
+          onClick={() => {
+            setActiveTab("Home");
+            navigate("/");
+          }}
+          className={`flex flex-col items-center transition-all ${
+            location.pathname === "/"
+              ? "text-[#DE5E08]"
+              : "text-black dark:text-white hover:text-[#DE5E08]"
+          }`}
+        >
+          <Home size={20} />
+          <span className="text-[10px] mt-1 block">Home</span>
+        </button>
+        
+        {tabs.map((tab, index) => {
+          const routePath = tab.label.toLowerCase();
+          return (
+            <button
+              key={index}
+              onClick={() => {
+                setActiveTab(tab.label);
+                navigate(`/${routePath}`);
+              }}
+              className={`flex flex-col items-center transition-all ${
+                location.pathname === `/${routePath}`
+                  ? "text-[#DE5E08]"
+                  : "text-black dark:text-white hover:text-[#DE5E08]"
+              }`}
+            >
+              {tab.icon}
+              <span className="text-[10px] mt-1 block">{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Right Panel */}
-      <div className="w-64 bg-[#162340] overflow-y-auto pt-5">
-        {/* Search Box */}
-        <div className="p-3">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full text-sm bg-gray-500 text-gray-100 px-3 py-2 rounded outline-none focus:ring-1 focus:ring-gray-200"
-          />
-        </div>
+      {/* Right Content Panel - Only show if not on Home page */}
+      {shouldShowRightPanel && (
+        <div className="flex-1 h-full bg-white dark:bg-gray-800 flex flex-col transition-colors duration-200">
+          {/* Fixed Search Box */}
+          <div className="p-3 pt-6 flex-shrink-0 pb-6">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-white text-black dark:text-white px-3 py-2 rounded outline-none focus:ring-1 focus:ring-gray-200 dark:focus:ring-gray-500 transition-colors duration-200"
+            />
+          </div>
 
-        {/* Sections only for active tab */}
-        <div className="space-y-2">
-          {activeTabData.sections.map((section, idx) => (
-            <div key={idx}>
-              <div
-                className={`flex justify-between items-center px-4 py-2 cursor-pointer text-gray-300 font-semibold text-sm hover:bg-[#1E2A4A] ${
-                  openSection === section.title
-                    ? "bg-[#1E2A4A] text-white"
-                    : ""
-                }`}
-                onClick={() => toggleSection(section.title)}
-              >
-                <span>{section.title}</span>
-                {openSection === section.title ? (
-                  <ChevronDown size={16} />
-                ) : (
-                  <ChevronRight size={16} />
-                )}
-              </div>
-
-              {/* Sub-items */}
-              {openSection === section.title && (
-                <div className="pl-6 pr-2 py-1 space-y-1 text-gray-400 text-sm">
-                  {section.items.map((item, i) => (
-                    <div
-                      key={i}
-                      className="cursor-pointer hover:text-white hover:bg-[#1E2A4A] px-2 py-1 rounded-md flex items-center gap-2"
-                    >
-                      <span className="text-xs">{">>"}</span> {item}
+          {/* Scrollable Sections */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar pb-6">
+            <div className="space-y-2 pb-4">
+              {sections.map((section, idx) => (
+                <div key={idx}>
+                  <div
+                    className={`flex justify-between items-center px-4 py-2 cursor-pointer text-gray-900 dark:text-white font-semibold text-sm hover:border-l-2  hover:border-[#DE5E08] ${
+                      openSections.includes(section.title)
+                        ? "bg-gray-100 border-l-2 border-[#DE5E08] dark:bg-gray-700 text-gray-900 dark:text-white"
+                        : ""
+                    }`}
+                    onClick={() => toggleSection(section.title)}
+                  >
+                    <span>{section.title}</span>
+                    <div className={`transition-transform duration-500 ease-in-out ${
+                      openSections.includes(section.title) ? 'rotate-90' : 'rotate-0'
+                    }`}>
+                      <ChevronRight size={16} />
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Sub-items */}
+                  <div 
+                    className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                      openSections.includes(section.title)
+                        ? 'max-h-96 opacity-100' 
+                        : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="pl-6 pr-2 py-1 space-y-1 text-gray-900 dark:text-white text-sm">
+                      {section.items.map((item, i) => (
+                        <div
+                          key={i}
+                          onClick={() => handleItemClick(item)}
+                          className={`cursor-pointer px-2 py-1 rounded-md flex items-center gap-2 transition-colors duration-200 ${
+                            selectedItem === item
+                              ? 'bg-gray-100 text-gray-900 dark:bg-[#DE5E08] dark:text-white'
+                              : 'dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
