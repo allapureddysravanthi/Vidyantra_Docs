@@ -127,7 +127,7 @@ const DropdownV1 = ({
                 onClick={() => {  
                   setSelectedOption(optionValue);
                   setDisplayText(optionLabel);
-                  onSelect(option);
+                  onSelect(optionValue);
                   setIsOpen(false);
                 }}
               >

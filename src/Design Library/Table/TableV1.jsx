@@ -6,11 +6,14 @@ const TableV1 = ({ columns = [], data = [], showCheckbox = true, noDataMessage =
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10); // default
 
-  const totalRows = data.length;
+  // Ensure data is always an array
+  const safeData = Array.isArray(data) ? data : [];
+  
+  const totalRows = safeData.length;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
 
 const start = (currentPage - 1) * rowsPerPage;
-const paginatedData = data.slice(start, start + rowsPerPage);
+const paginatedData = safeData.slice(start, start + rowsPerPage);
 
   const startCount = (currentPage - 1) * rowsPerPage + 1;
   const endCount = Math.min(startCount + rowsPerPage - 1, totalRows);

@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { loginUser } from '../lib/api/documentation.api';
+import { useAuth } from '../hooks/useAuth';
 import ButtonV2 from '../Design Library/Button/ButtonV2';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const Signin = () => {
   const { isDark } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { checkAuthStatus } = useAuth();
+  
+  // Get return URL from location state or search params
+  const returnUrl = location.state?.returnUrl || new URLSearchParams(location.search).get('returnUrl') || '/admin';
+  
   const [formData, setFormData] = useState({
-    email: '',
+    username: '', // Changed from email to username to match API
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,16 +43,12 @@ const Signin = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
     }
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     
     setErrors(newErrors);
@@ -57,20 +63,34 @@ const Signin = () => {
     }
     
     setIsLoading(true);
+    setLoginError('');
+    setLoginSuccess(false);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Login data:', formData);
-      // Handle successful login here
-      alert('Login successful!');
+      const response = await loginUser({
+        username: formData.username,
+        password: formData.password
+      });
+      
+      // Show success message
+      setLoginSuccess(true);
+      
+      // Refresh auth status
+      await checkAuthStatus();
+      
+      // Redirect to the intended page after a short delay
+      setTimeout(() => {
+        navigate(returnUrl, { replace: true });
+      }, 1500);
+      
     } catch (error) {
       console.error('Login error:', error);
-      alert('Login failed. Please try again.');
+      setLoginError(error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const inputStyle = {
     width: '100%',
@@ -122,30 +142,30 @@ const Signin = () => {
         {/* Login Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* Email Field */}
+            {/* Username Field */}
             <div>
-              <label htmlFor="email" className={`block text-sm font-medium mb-2 transition-colors duration-200 ${
+              <label htmlFor="username" className={`block text-sm font-medium mb-2 transition-colors duration-200 ${
                 isDark ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                Email address
+                Username / Email
               </label>
                <div className="relative">
                  <input
-                   id="email"
-                   name="email"
-                   type="email"
-                   autoComplete="email"
+                   id="username"
+                   name="username"
+                   type="text"
+                   autoComplete="username"
                    required
-                   value={formData.email}
+                   value={formData.username}
                    onChange={handleInputChange}
                    style={inputStyle}
                    onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
-                   onBlur={(e) => e.target.style.borderColor = errors.email ? '#EF4444' : (isDark ? '#374151' : '#D1D5DB')}
-                   placeholder="Enter your email"
+                   onBlur={(e) => e.target.style.borderColor = errors.username ? '#EF4444' : (isDark ? '#374151' : '#D1D5DB')}
+                   placeholder="Enter your username or email"
                  />
                </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-500">{errors.username}</p>
               )}
             </div>
 
@@ -193,6 +213,19 @@ const Signin = () => {
             </div>
           </div>
 
+          {/* Success Message */}
+          {loginSuccess && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p className="text-green-800 text-sm">✅ Login successful! Redirecting...</p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {loginError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 text-sm">{loginError}</p>
+            </div>
+          )}
 
           {/* Submit Button */}
           <div>
@@ -213,6 +246,7 @@ const Signin = () => {
               {isLoading ? 'Signing in...' : 'Sign in'}
             </ButtonV2>
           </div>
+
 
 
         </form>

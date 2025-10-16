@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoMdLogOut } from "react-icons/io";
-import { Menu, Search, Bell, HelpCircle, Sun, Moon } from "lucide-react";
+import { Menu, Search, Bell, HelpCircle, Sun, Moon, User, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import ButtonV2 from "../Design Library/Button/ButtonV2";
 import SearchInput from "../Design Library/SearchInput/SearchInput";
 import { useTheme } from "../contexts/ThemeContext";
 import { useNavigation } from "../contexts/NavigationContext";
+import { useAuth } from "../hooks/useAuth";
 
 const Navbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = ({ toggleSidebar }) => {
   const { theme, toggleTheme, isDark } = useTheme();
   const location = useLocation();
   const { showNavbarSearch, searchValue, setSearchValue } = useNavigation();
+  const { isAuthenticated, user, logout } = useAuth();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -117,15 +119,79 @@ const Navbar = ({ toggleSidebar }) => {
                 )}
               </button>
               
-              <Link to="/signin">
-                <ButtonV2 
-                  textColor={isDark ? "#FFFFFF" : "#01274D"}
-                  border={isDark ? "1px solid #ffffff" : "1px solid #1F2937"}
-                  // hoverTextColor="#F5F5F5" hoverBgColor='#DE5E08'
-                >
-                  Sign in
-                </ButtonV2>
-              </Link>
+              {isAuthenticated ? (
+                // Profile Dropdown
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#DE5E08] flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {user?.name || user?.email || 'User'}
+                    </span>
+                  </button>
+                  
+                  {isDropdownOpen && (
+                    <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg border z-50 ${
+                      isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                    }`}>
+                      <div className="py-1">
+                        <div className={`px-4 py-2 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                          <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {user?.name || 'User'}
+                          </p>
+                          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {user?.email}
+                          </p>
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            // Navigate to profile/settings
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            Settings
+                          </div>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            logout();
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <IoMdLogOut className="w-4 h-4" />
+                            Sign out
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // Sign in button for non-authenticated users
+                <Link to="/signin">
+                  <ButtonV2 
+                    textColor={isDark ? "#FFFFFF" : "#01274D"}
+                    border={isDark ? "1px solid #ffffff" : "1px solid #1F2937"}
+                  >
+                    Sign in
+                  </ButtonV2>
+                </Link>
+              )}
             </div>
           </div>
 
