@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigation } from '../contexts/NavigationContext';
+import { useSearch } from '../hooks/useSearch';
+import SearchResults from '../components/SearchResults';
 import { 
   CreditCard, 
   Link, 
@@ -36,6 +38,9 @@ import {
 const Home = () => {
   const { isDark } = useTheme();
   const { setActiveTab, setShowNavbarSearch, searchValue, setSearchValue } = useNavigation();
+  const { searchResults, isLoading, error, hasSearched, search, clearSearch } = useSearch();
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const searchRef = useRef(null);
 
   // Set active tab to Home when component mounts
   useEffect(() => {
@@ -43,6 +48,40 @@ const Home = () => {
     // Hide navbar search initially on home page
     setShowNavbarSearch(false);
   }, [setActiveTab, setShowNavbarSearch]);
+
+  // Handle search input changes
+  useEffect(() => {
+    if (searchValue) {
+      search(searchValue);
+    } else {
+      clearSearch();
+    }
+  }, [searchValue, search, clearSearch]);
+
+  // Handle click outside search
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchFocused(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Handle search result click
+  const handleSearchResultClick = (result) => {
+    setIsSearchFocused(false);
+    setSearchValue("");
+  };
+
+  // Handle search input focus
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+  };
 
   // Add scroll detection
   useEffect(() => {
@@ -242,12 +281,13 @@ const Home = () => {
               Streamline operations, enhance collaboration, and scale your educational institution with our comprehensive platform designed for modern organizations.
             </p>
             <div className="max-w-2xl mx-auto">
-              <div className="relative">
+              <div className="relative" ref={searchRef}>
                 <input
                   type="text"
                   placeholder="Search documentation..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
+                  onFocus={handleSearchFocus}
                   className={`w-full px-6 py-4 pl-12 rounded-lg border transition-colors duration-200 text-lg ${
                     isDark 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-[#DE5E08] focus:ring-2 focus:ring-[#DE5E08]/20' 
@@ -271,6 +311,20 @@ const Home = () => {
                     />
                   </svg>
                 </div>
+                
+                {/* Search Results Dropdown */}
+                {isSearchFocused && (hasSearched || isLoading) && (
+                  <div className="absolute top-full left-0 right-0 mt-2 z-50">
+                    <SearchResults
+                      results={searchResults}
+                      isLoading={isLoading}
+                      error={error}
+                      hasSearched={hasSearched}
+                      onResultClick={handleSearchResultClick}
+                      isDark={isDark}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

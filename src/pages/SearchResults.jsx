@@ -44,7 +44,13 @@ const SearchResults = () => {
   }
 
   function handleArticleClick(article) {
-    navigate(`/${scope}/doc/${article.slug}`);
+    // Use ID-based navigation for better sidebar integration and cross-scope support
+    if (article.id) {
+      navigate(`/${scope}/article/${article.id}`);
+    } else {
+      // Fallback to slug-based navigation if no ID is available
+      navigate(`/${scope}/doc/${article.slug}`);
+    }
   }
 
   return (

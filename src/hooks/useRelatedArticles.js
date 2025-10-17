@@ -23,9 +23,18 @@ export const useRelatedArticles = (articleId, scope) => {
       setLoading(true);
       setError(null);
 
-      const response = scope === 'platform' 
-        ? await getRelatedArticles(articleId)
-        : await getPublicRelatedArticles(articleId);
+      let response;
+      if (scope === 'platform') {
+        try {
+          response = await getRelatedArticles(articleId);
+        } catch (error) {
+          console.warn('Platform related articles failed, trying public API:', error.message);
+          // Fallback to public API if platform API fails
+          response = await getPublicRelatedArticles(articleId);
+        }
+      } else {
+        response = await getPublicRelatedArticles(articleId);
+      }
 
       if (response.success && response.data) {
         setRelatedArticles(response.data || []);

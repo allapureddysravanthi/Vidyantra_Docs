@@ -5,6 +5,7 @@ import { loginUser } from '../lib/api/documentation.api';
 import { useAuth } from '../hooks/useAuth';
 import ButtonV2 from '../Design Library/Button/ButtonV2';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { displayToast } from '../Design Library/Toast/Toast';
 
 const Signin = () => {
   const { isDark } = useTheme();
@@ -22,8 +23,6 @@ const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,8 +62,6 @@ const Signin = () => {
     }
     
     setIsLoading(true);
-    setLoginError('');
-    setLoginSuccess(false);
     
     try {
       const response = await loginUser({
@@ -72,8 +69,8 @@ const Signin = () => {
         password: formData.password
       });
       
-      // Show success message
-      setLoginSuccess(true);
+      // Show success toast
+      displayToast('success', 'Login successful! Redirecting...');
       
       // Refresh auth status
       await checkAuthStatus();
@@ -85,7 +82,8 @@ const Signin = () => {
       
     } catch (error) {
       console.error('Login error:', error);
-      setLoginError(error.message || 'Login failed. Please check your credentials.');
+      // Show error toast
+      displayToast('error', error.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -213,19 +211,6 @@ const Signin = () => {
             </div>
           </div>
 
-          {/* Success Message */}
-          {loginSuccess && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-green-800 text-sm">✅ Login successful! Redirecting...</p>
-            </div>
-          )}
-
-          {/* Error Message */}
-          {loginError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 text-sm">{loginError}</p>
-            </div>
-          )}
 
           {/* Submit Button */}
           <div>

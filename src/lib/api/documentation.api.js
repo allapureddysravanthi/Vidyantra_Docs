@@ -93,7 +93,9 @@ function buildHeaders(requireAuth = false) {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   } else if (requireAuth) {
-    throw new Error('Authentication required but no token found');
+    console.warn('Authentication required but no token found. Making request without auth header.');
+    // Don't throw error, just log warning and continue without auth
+    // This allows graceful degradation for public endpoints
   }
 
   return headers;
@@ -103,21 +105,47 @@ function buildHeaders(requireAuth = false) {
  * Make API request with automatic token handling
  */
 async function apiRequest(endpoint, options = {}, requireAuth = false) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      ...buildHeaders(requireAuth),
-      ...options.headers
-    },
-    credentials: 'include' // Important for CORS with cookies
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        ...buildHeaders(requireAuth),
+        ...options.headers
+      },
+      credentials: 'include' // Important for CORS with cookies
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'API request failed');
+    if (!response.ok) {
+      let errorMessage = 'API request failed';
+      try {
+        const error = await response.json();
+        errorMessage = error.message || errorMessage;
+      } catch (parseError) {
+        // If response is not JSON, use status text
+        errorMessage = response.statusText || errorMessage;
+      }
+      
+      // Log detailed error information
+      console.error('API Request Failed:', {
+        endpoint,
+        status: response.status,
+        statusText: response.statusText,
+        message: errorMessage,
+        requireAuth
+      });
+      
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('API Request Error:', {
+      endpoint,
+      error: error.message,
+      requireAuth
+    });
+    throw error;
   }
-
-  return response.json();
 }
 
 // ============================================================================
@@ -167,6 +195,14 @@ export async function getPublicArticleById(id) {
  */
 export async function searchPublicArticles(query, scope) {
   return apiRequest(`/documentation/public/documentation/articles?search=${encodeURIComponent(query)}&scope=${scope}`);
+}
+
+/**
+ * Search platform articles (authenticated)
+ * Token: REQUIRED (needs platform.documentation.view permission)
+ */
+export async function searchPlatformArticles(query) {
+  return apiRequest(`/documentation/articles?search=${encodeURIComponent(query)}`, {}, true);
 }
 
 /**

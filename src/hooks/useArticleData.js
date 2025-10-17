@@ -34,7 +34,13 @@ export const useArticleData = () => {
       } else if (slug && scope) {
         // Fetch by slug and scope
         if (scope === 'platform') {
-          response = await getPlatformArticleBySlug(slug);
+          try {
+            response = await getPlatformArticleBySlug(slug);
+          } catch (error) {
+            console.warn('Platform article fetch failed, trying public API:', error.message);
+            // Fallback to public API if platform API fails
+            response = await getPublicArticleBySlug(slug, scope);
+          }
         } else {
           // For organization and branch articles
           response = await getPublicArticleBySlug(slug, scope);

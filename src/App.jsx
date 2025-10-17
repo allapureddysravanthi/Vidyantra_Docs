@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Documentation_Layout from './components/Documentation_Layout';
 import NotFound from './components/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScopePage from './components/ScopePage';
 import Signin from './pages/Login';
 import Home from './pages/Home';
 import Platform from './pages/Platform';
@@ -38,16 +39,8 @@ const App = () => {
                 <ArticlePage />
               </ProtectedRoute>
             } />
-            <Route path="organization/article/:id" element={
-              <ProtectedRoute>
-                <ArticlePage />
-              </ProtectedRoute>
-            } />
-            <Route path="branch/article/:id" element={
-              <ProtectedRoute>
-                <ArticlePage />
-              </ProtectedRoute>
-            } />
+            <Route path="organization/article/:id" element={<ArticlePage />} />
+            <Route path="branch/article/:id" element={<ArticlePage />} />
             
             {/* Protected Article Routes by Slug - Must come before general routes */}
             <Route path="platform/doc/:slug" element={
@@ -55,32 +48,20 @@ const App = () => {
                 <ArticlePage />
               </ProtectedRoute>
             } />
-            <Route path="organization/doc/:slug" element={
-              <ProtectedRoute>
-                <ArticlePage />
-              </ProtectedRoute>
-            } />
-            <Route path="branch/doc/:slug" element={
-              <ProtectedRoute>
-                <ArticlePage />
-              </ProtectedRoute>
-            } />
+            <Route path="organization/doc/:slug" element={<ArticlePage />} />
+            <Route path="branch/doc/:slug" element={<ArticlePage />} />
             
             {/* Protected Platform Routes - Must come after specific routes */}
             <Route path="platform" element={
               <ProtectedRoute>
-                <Platform />
+                <ScopePage scope="platform" StaticComponent={Platform} />
               </ProtectedRoute>
             } />
             <Route path="organization" element={
-              <ProtectedRoute>
-                <Organization />
-              </ProtectedRoute>
+              <ScopePage scope="organization" StaticComponent={Organization} />
             } />
             <Route path="branch" element={
-              <ProtectedRoute>
-                <Branch />
-              </ProtectedRoute>
+              <ScopePage scope="branch" StaticComponent={Branch} />
             } />
             
             {/* Protected Search Routes */}
@@ -89,16 +70,8 @@ const App = () => {
                 <SearchResults />
               </ProtectedRoute>
             } />
-            <Route path="organization/search" element={
-              <ProtectedRoute>
-                <SearchResults />
-              </ProtectedRoute>
-            } />
-            <Route path="branch/search" element={
-              <ProtectedRoute>
-                <SearchResults />
-              </ProtectedRoute>
-            } />
+            <Route path="organization/search" element={<SearchResults />} />
+            <Route path="branch/search" element={<SearchResults />} />
             
             {/* Protected Admin Routes */}
             <Route path="admin" element={

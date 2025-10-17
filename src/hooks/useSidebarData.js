@@ -34,6 +34,31 @@ export const useSidebarData = () => {
     return null;
   };
 
+  // Get article scope from URL parameters or article data
+  const getArticleScope = () => {
+    const path = location.pathname;
+    
+    // For article pages, try to determine the actual article scope
+    if (path.includes('/article/')) {
+      // Extract article ID from URL
+      const pathParts = path.split('/');
+      const articleId = pathParts[pathParts.length - 1];
+      
+      // For now, we'll use a simple mapping based on article ID patterns
+      // This could be enhanced to fetch the actual article scope from the API
+      if (articleId.includes('organization') || articleId === 'art-organization-setup') {
+        return 'organization';
+      } else if (articleId.includes('branch') || articleId === 'art-daily-operations') {
+        return 'branch';
+      } else if (articleId.includes('platform') || articleId === 'art-platform-overview') {
+        return 'platform';
+      }
+    }
+    
+    // Fallback to route-based scope
+    return getScopeFromRoute();
+  };
+
   const fetchSidebarData = async () => {
     // Prevent multiple simultaneous calls
     if (loadingRef.current) {
@@ -41,7 +66,7 @@ export const useSidebarData = () => {
       return;
     }
     
-    const scope = getScopeFromRoute();
+    const scope = getArticleScope();
     console.log('useSidebarData: Fetching sidebar data for scope:', scope, 'path:', location.pathname);
     
     // Don't fetch sidebar data for admin pages - show "No articles" instead

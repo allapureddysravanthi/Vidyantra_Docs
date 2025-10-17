@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { config } from '../config/environment';
 import { logoutUser } from '../lib/api/documentation.api';
 import { getAccessToken, setAccessToken, clearAuthCookies } from '../utils/cookieUtils';
+import { displayToast } from '../Design Library/Toast/Toast';
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +14,19 @@ export function useAuth() {
   // Function to get token from cookies (using utility)
   const getTokenFromCookies = () => {
     return getAccessToken();
+  };
+
+  // Function to validate token
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const now = Date.now() / 1000;
+      return payload.exp > now;
+    } catch (error) {
+      return false;
+    }
   };
 
   // Function to check authentication status
@@ -27,6 +41,15 @@ export function useAuth() {
       }
       
       if (token) {
+        // Check if token is valid (not expired)
+        if (!isTokenValid(token)) {
+          console.warn('Token is expired or invalid');
+          localStorage.removeItem('contextToken');
+          clearAuthCookies();
+          displayToast('warning', 'Your session has expired. Please log in again.');
+          return;
+        }
+
         try {
           // Simple JWT decode (you can install jwt-decode for production)
           const payload = JSON.parse(atob(token.split('.')[1]));
@@ -57,14 +80,24 @@ export function useAuth() {
           setPermissions(userPermissions);
           setIsAuthenticated(true);
         } catch (error) {
-          console.error('Invalid token:', error);
+          console.error('Invalid token format:', error);
           // Clear invalid tokens
           localStorage.removeItem('contextToken');
           clearAuthCookies();
+          // Show toast notification for expired/invalid token
+          displayToast('warning', 'Your session has expired. Please log in again.');
         }
+      } else {
+        console.log('No authentication token found');
+        setIsAuthenticated(false);
+        setUser(null);
+        setPermissions([]);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+      setUser(null);
+      setPermissions([]);
     } finally {
       setLoading(false);
     }
@@ -99,8 +132,15 @@ export function useAuth() {
     // Clear all authentication cookies
     clearAuthCookies();
     
-    // Reload to update auth state
-    window.location.reload();
+    // Clear search cache on logout
+    try {
+      localStorage.removeItem('vidyantra_search_cache');
+    } catch (error) {
+      console.error('Error clearing search cache:', error);
+    }
+    
+    // Note: Navigation is now handled by the calling component
+    // No longer reloading the page here
   }
 
   function setToken(token) {

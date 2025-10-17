@@ -7,6 +7,7 @@ const SearchInput = ({
   value,
   onChange,
   onClear,
+  onFocus,
   icon = 'search',
   disabled = false,
   width = '200px',
@@ -57,7 +58,10 @@ const SearchInput = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        onFocus={() => setIsFocused(true)}
+        onFocus={(e) => {
+          setIsFocused(true);
+          onFocus && onFocus(e);
+        }}
         onBlur={() => setIsFocused(false)}
         disabled={disabled}
         style={inputStyle}

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { RxDotsHorizontal } from "react-icons/rx";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const TableV1 = ({ columns = [], data = [], showCheckbox = true, noDataMessage = "No records found" }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10); // default
+  const { isDark } = useTheme();
 
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
@@ -64,7 +66,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
         <button
           key={1}
           onClick={() => setCurrentPage(1)}
-          style={pageButtonStyle(false)}
+          style={pageButtonStyle(false, isDark)}
         >
           1
         </button>
@@ -73,7 +75,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
         pageNumbers.push(
           <RxDotsHorizontal
             key="start-ellipsis"
-            style={{ color: "#A0AEC0", fontSize: "18px" }}
+            style={{ color: isDark ? "#6B7280" : "#A0AEC0", fontSize: "18px" }}
           />
         );
       }
@@ -85,7 +87,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
         <button
           key={i}
           onClick={() => setCurrentPage(i)}
-          style={pageButtonStyle(isActive)}
+          style={pageButtonStyle(isActive, isDark)}
         >
           {i}
         </button>
@@ -97,7 +99,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
         pageNumbers.push(
           <RxDotsHorizontal
             key="end-ellipsis"
-            style={{ color: "#A0AEC0", fontSize: "18px" }}
+            style={{ color: isDark ? "#6B7280" : "#A0AEC0", fontSize: "18px" }}
           />
         );
       }
@@ -105,7 +107,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
         <button
           key={totalPages}
           onClick={() => setCurrentPage(totalPages)}
-          style={pageButtonStyle(false)}
+          style={pageButtonStyle(false, isDark)}
         >
           {totalPages}
         </button>
@@ -115,26 +117,115 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
     return pageNumbers;
   };
 
+  // Theme-aware styles
+  const themeStyles = {
+    container: {
+      width: "100%",
+      fontSize: "14px",
+      color: isDark ? "#E5E7EB" : "#1F2937"
+    },
+    table: {
+      width: "100%",
+      borderCollapse: "collapse",
+      border: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      backgroundColor: isDark ? "#1F2937" : "#FFFFFF"
+    },
+    headerRow: {
+      fontWeight: 700,
+      fontSize: "14px",
+      lineHeight: "20px",
+      letterSpacing: "0px",
+      color: isDark ? "#D1D5DB" : "#4B5563",
+      border: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      backgroundColor: isDark ? "#111827" : "#F9FAFB"
+    },
+    headerCell: {
+      padding: "8px",
+      textAlign: "left",
+      fontWeight: 700,
+      fontSize: "14px",
+      color: isDark ? "#D1D5DB" : "#4B5563"
+    },
+    checkboxCell: {
+      padding: "8px",
+      textAlign: "center"
+    },
+    bodyRow: {
+      borderRight: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      cursor: "pointer",
+      color: isDark ? "#D1D5DB" : "#4B5563",
+      backgroundColor: "transparent"
+    },
+    bodyRowSelected: {
+      borderRight: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      cursor: "pointer",
+      color: isDark ? "#D1D5DB" : "#4B5563",
+      backgroundColor: isDark ? "#1E40AF" : "#e8f0fe"
+    },
+    bodyRowHover: {
+      backgroundColor: isDark ? "#374151" : "#f9fafb"
+    },
+    bodyRowSelectedHover: {
+      backgroundColor: isDark ? "#1E40AF" : "#e8f0fe"
+    },
+    bodyCell: {
+      borderTop: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      borderBottom: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      padding: "8px",
+      fontWeight: 500,
+      fontSize: "14px",
+      color: isDark ? "#D1D5DB" : "#4B5563"
+    },
+    bodyCellHighlighted: {
+      borderTop: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      borderBottom: `1px solid ${isDark ? "#374151" : "#F3F4F6"}`,
+      padding: "8px",
+      fontWeight: 500,
+      fontSize: "14px",
+      color: isDark ? "#60A5FA" : "#0056b3",
+      textDecoration: "underline"
+    },
+    noDataCell: {
+      textAlign: "center",
+      padding: "20px",
+      color: isDark ? "#9CA3AF" : "#6B7280",
+      fontSize: "14px"
+    },
+    footer: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: "50px",
+      padding: "0 8px"
+    },
+    footerInfo: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      color: isDark ? "#D1D5DB" : "#4B5563",
+      fontSize: "12px"
+    },
+    select: {
+      padding: "2px 6px",
+      fontSize: "12px",
+      border: `1px solid ${isDark ? "#4B5563" : "#ccc"}`,
+      borderRadius: "4px",
+      backgroundColor: isDark ? "#374151" : "#fff",
+      color: isDark ? "#D1D5DB" : "#1F2937",
+      cursor: "pointer"
+    },
+    paginationContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px"
+    }
+  };
+
   return (
-    <div style={{ width: "100%", fontSize: "14px" }}>
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          border: "1px solid #F3F4F6",
-        }}
-      >
+    <div style={themeStyles.container}>
+      <table style={themeStyles.table}>
         <thead>
-          <tr
-            style={{
-              fontWeight: 700,
-              fontSize: "14px",
-              lineHeight: "20px",
-              letterSpacing: "0px",
-              color: "#4B5563",
-              border: "1px solid #F3F4F6",
-            }}
-          >
+          <tr style={themeStyles.headerRow}>
             {/* <th
               style={{
                 border: "1px solid #F3F4F6",
@@ -145,7 +236,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
               S.No
             </th> */}
             {showCheckbox && (
-              <th style={{ padding: "8px", textAlign: "center" }}>
+              <th style={themeStyles.checkboxCell}>
                 <input
                   type="checkbox"
                   checked={isAllSelected}
@@ -156,7 +247,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
             )}
 
             {columns.map((col, idx) => (
-              <th key={idx} style={{ padding: "8px", textAlign: "left",fontWeight:700,fontSize:'14px' }}>
+              <th key={idx} style={themeStyles.headerCell}>
                 <div
                   style={{
                     display: "flex",
@@ -179,12 +270,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
     <tr>
     <td
   colSpan={columns.length + (showCheckbox ? 1 : 0)}
-  style={{
-    textAlign: "center",
-    padding: "20px",
-    color: "#6B7280",
-    fontSize: "14px",
-  }}
+  style={themeStyles.noDataCell}
 >
   {noDataMessage}
 </td>
@@ -198,32 +284,20 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
       return (
         <tr
           key={rIdx}
-          style={{
-            borderRight: "1px solid #F3F4F6",
-            cursor: "pointer",
-            color: "#4B5563",
-            backgroundColor: isSelected ? "#e8f0fe" : "transparent",
-          }}
+          style={isSelected ? themeStyles.bodyRowSelected : themeStyles.bodyRow}
           onMouseOver={(e) =>
             (e.currentTarget.style.background = isSelected
-              ? "#e8f0fe"
-              : "#f9fafb")
+              ? themeStyles.bodyRowSelectedHover.backgroundColor
+              : themeStyles.bodyRowHover.backgroundColor)
           }
           onMouseOut={(e) =>
             (e.currentTarget.style.background = isSelected
-              ? "#e8f0fe"
-              : "transparent")
+              ? themeStyles.bodyRowSelected.backgroundColor
+              : themeStyles.bodyRow.backgroundColor)
           }
         >
           {showCheckbox && (
-            <td
-              style={{
-                borderTop: "1px solid #F3F4F6",
-                borderBottom: "1px solid #F3F4F6",
-                padding: "8px",
-                textAlign: "center",
-              }}
-            >
+            <td style={themeStyles.bodyCell}>
               <input
                 type="checkbox"
                 checked={isSelected}
@@ -237,21 +311,11 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
             return (
               <td
                 key={cIdx}
-                style={{
-                  borderTop: "1px solid #F3F4F6",
-                  borderBottom: "1px solid #F3F4F6",
-                  padding: "8px",
-                  fontWeight: 500,
-                  fontSize: "14px",
-                  color:
-                    col.highlightOnSelect && isSelected
-                      ? "#0056b3"
-                      : "#4B5563",
-                  textDecoration:
-                    col.highlightOnSelect && isSelected
-                      ? "underline"
-                      : "none",
-                }}
+                style={
+                  col.highlightOnSelect && isSelected
+                    ? themeStyles.bodyCellHighlighted
+                    : themeStyles.bodyCell
+                }
               >
                 {col.cellRenderer
                   ? col.cellRenderer(value, row)
@@ -268,24 +332,8 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
       </table>
 
       {/* Footer */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "50px",
-          padding: "0 8px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            color: "#4B5563",
-            fontSize: "12px",
-          }}
-        >
+      <div style={themeStyles.footer}>
+        <div style={themeStyles.footerInfo}>
           <span>
             {startCount}-{endCount} of {totalRows}
           </span>
@@ -298,14 +346,7 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
                 setRowsPerPage(Number(e.target.value));
                 setCurrentPage(1); // Reset to first page
               }}
-              style={{
-                padding: "2px 6px",
-                fontSize: "12px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                backgroundColor: "#fff",
-                cursor: "pointer",
-              }}
+              style={themeStyles.select}
             >
               {[5, 10, 25, 50].map((opt) => (
                 <option key={opt} value={opt}>
@@ -317,11 +358,11 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={themeStyles.paginationContainer}>
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
-            style={navButtonStyle(currentPage === 1)}
+            style={navButtonStyle(currentPage === 1, isDark)}
           >
             <GrFormPrevious style={{ fontSize: "18px" }} /> Previous
           </button>
@@ -334,7 +375,8 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
             disabled={currentPage === totalPages || totalRows === 0}
             style={navButtonStyle(
-              currentPage === totalPages || totalRows === 0
+              currentPage === totalPages || totalRows === 0,
+              isDark
             )}
           >
             Next <GrFormNext style={{ fontSize: "18px" }} />
@@ -345,29 +387,29 @@ const paginatedData = safeData.slice(start, start + rowsPerPage);
   );
 };
 
-// Button styles
-const pageButtonStyle = (isActive) => ({
+// Button styles - now theme-aware
+const pageButtonStyle = (isActive, isDark) => ({
   height: "24px",
   width: "24px",
   borderRadius: "50%",
-  border: "1px solid #ccc",
+  border: `1px solid ${isDark ? "#4B5563" : "#ccc"}`,
   fontSize: "10px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   backgroundColor: isActive ? "#0056B3" : "transparent",
-  color: isActive ? "#fff" : "#000",
+  color: isActive ? "#fff" : (isDark ? "#D1D5DB" : "#000"),
   cursor: "pointer",
 });
 
-const navButtonStyle = (disabled) => ({
+const navButtonStyle = (disabled, isDark) => ({
   padding: "6px 10px",
   border: "none",
   borderRadius: "4px",
   display: "flex",
   alignItems: "center",
   gap: "4px",
-  color: disabled ? "#A0AEC0" : "#4B5563",
+  color: disabled ? "#A0AEC0" : (isDark ? "#D1D5DB" : "#4B5563"),
   backgroundColor: "transparent",
   cursor: disabled ? "not-allowed" : "pointer",
 });

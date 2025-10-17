@@ -14,6 +14,11 @@ export const NavigationProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState("Platform");
   const [showNavbarSearch, setShowNavbarSearch] = useState(true); // Show by default on other pages
   const [searchValue, setSearchValue] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar open by default
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
 
   const value = {
     activeTab,
@@ -21,7 +26,10 @@ export const NavigationProvider = ({ children }) => {
     showNavbarSearch,
     setShowNavbarSearch,
     searchValue,
-    setSearchValue
+    setSearchValue,
+    isSidebarOpen,
+    setIsSidebarOpen,
+    toggleSidebar
   };
 
   return (
